@@ -85,7 +85,7 @@ for i,line in enumerate(lines):
             notes[-1] = [title, prev_line.strip('>> '), notes[-1][2], idx - 1]
 
 # write to csv
-with open(path[:path.index('txt')] + 'csv', 'w', newline='') as notion:
+with open(path[:path.index('txt')] + 'csv', 'w', newline='', encoding = 'utf8') as notion:
     writer = csv.writer(notion)
     # initialize headers
     writer.writerow(['Location', 'Highlight', 'Note', 'No.'])
