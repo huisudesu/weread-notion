@@ -41,29 +41,48 @@ with open(path, 'r') as weread:
     # skip title
     weread.readline()
     lines = weread.readlines()
+    # remove 5 lines, including book name, author, etc.
+    lines = lines[4:]
+    # for line in lines:
+    #     if line == '\n':
+    #         lines.remove(line)
 
 notes = []
 # notion import csv is in random sort (why?????), so we need index
 # notion import same length rows (why???), thus the stupid placeholder ' '
+prev_line = ''
+idx = 0
 for i,line in enumerate(lines):
     line = line.strip('\n')
+    if line == '':
+        prev_line = ''
+        continue
     # chapter beginning, format '◆ chapter title'
     if line.startswith('◆'):
         title = line.strip('◆ ')
     # underlined highlight without note
     elif line.startswith('>>'):
-        notes.append([title, line.strip('>> '), ' ', i])
+        if prev_line:
+            if not prev_line.startswith('>>'):
+                notes[-1] = [title, line.strip('>> '), prev_line, idx - 1]
+        else:
+            notes.append([title, line.strip('>> '), ' ', idx])
+            idx += 1
+        prev_line = line
     # review if any
     elif line.startswith('★'):
-        notes.append([title, line, ' ', i])
+        notes.append([title, line, ' ', idx])
+        idx += 1
+        prev_line = line
     # highlight qith notes, format 'notes>highlight'
     else:
-        delimiter = line.find('>')
-        if delimiter > 0:
-            notes.append([title, line[delimiter + 1:], line[:delimiter], i])
-        # this shouldn't happen but just in case
-        else:
-            notes.append([title, line, ' ', i])
+        if not prev_line:
+            notes.append([title, ' ', line, idx])
+            idx += 1
+            prev_line = line
+        elif prev_line.startswith('>>'):
+            prev_line = prev_line + line
+            notes[-1] = [title, prev_line.strip('>> '), notes[-1][2], idx - 1]
 
 # write to csv
 with open(path[:path.index('txt')] + 'csv', 'w', newline='') as notion:
