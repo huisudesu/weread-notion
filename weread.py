@@ -37,7 +37,7 @@ if not os.path.isfile(path):
     print('The path specified does not exist, make sure it is a txt file')
     sys.exit()
 
-with open(path, 'r') as weread:
+with open(path, 'r', encoding = 'utf8') as weread:
     # skip title
     weread.readline()
     lines = weread.readlines()
