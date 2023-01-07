@@ -37,11 +37,16 @@ if not os.path.isfile(path):
     print('The path specified does not exist, make sure it is a txt file')
     sys.exit()
 
+book = ""
+author=""
+
 with open(path, 'r', encoding = 'utf8') as weread:
     # skip title
-    weread.readline()
+    # weread.readline()
     lines = weread.readlines()
     # remove 5 lines, including book name, author, etc.
+    book = lines[0].strip('\n')
+    author = lines[1].strip('\n')
     lines = lines[4:]
     # for line in lines:
     #     if line == '\n':
@@ -64,9 +69,9 @@ for i,line in enumerate(lines):
     elif line.startswith('>>'):
         if prev_line:
             if not prev_line.startswith('>>'):
-                notes[-1] = [title, line.strip('>> '), prev_line, idx - 1]
+                notes[-1] = [line.strip('>> '), book, author, prev_line]
         else:
-            notes.append([title, line.strip('>> '), ' ', idx])
+            notes.append([line.strip('>> '), book, author, ' '])
             idx += 1
         prev_line = line
     # review if any
@@ -77,16 +82,17 @@ for i,line in enumerate(lines):
     # highlight qith notes, format 'notes>highlight'
     else:
         if not prev_line:
-            notes.append([title, ' ', line, idx])
+            notes.append([' ', book, author, line])
             idx += 1
             prev_line = line
         elif prev_line.startswith('>>'):
             prev_line = prev_line + line
-            notes[-1] = [title, prev_line.strip('>> '), notes[-1][2], idx - 1]
+            notes[-1] = [prev_line.strip('>> '), book, author, notes[-1][2]]
 
 # write to csv
 with open(path[:path.index('txt')] + 'csv', 'w', newline='', encoding = 'utf8') as notion:
     writer = csv.writer(notion)
     # initialize headers
-    writer.writerow(['Location', 'Highlight', 'Note', 'No.'])
+    # Highlight, Book title, Author, Note, Location
+    writer.writerow(['Highlight', 'Title', 'Author', 'Note'])
     writer.writerows(notes)
