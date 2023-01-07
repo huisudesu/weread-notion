@@ -2,6 +2,8 @@
 
 修改说明
 - 适配微信读书 iOS 最新导出格式。
+- Readwise 分支：导出到能够导入 Readwise 的 csv。
+
 
 ---
 
